@@ -32,6 +32,9 @@ public class DevWebConfig extends WebMvcConfigurerAdapter {
         // Warning
         log.warn("[dev] Running in DEV mode");
 
+        // Base path
+        log.info("[dev] Base Web path at " + devSettings.getWeb());
+
         // Compiled production resources
 
         String prod = getPath(devSettings.getProd());
