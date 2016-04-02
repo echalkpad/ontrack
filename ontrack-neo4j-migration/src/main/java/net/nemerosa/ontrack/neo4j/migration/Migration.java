@@ -38,13 +38,17 @@ public class Migration {
 
     private void migrateProject(Project project) {
         logger.info("Migrating project {}...", project.getName());
-        template.execute(
-                "CREATE (p:Project, {name: :name, description: description})",
+        template.query(
+                "MERGE (p:Project {name: {name}, description: {description}})",
                 ImmutableMap.<String, Object>builder()
                         .put("name", project.getName())
-                        .put("description", project.getDescription())
+                        .put("description", safeString(project.getDescription()))
                         .build()
         );
+    }
+
+    private String safeString(String description) {
+        return description == null ? "" : description;
     }
 
 }
