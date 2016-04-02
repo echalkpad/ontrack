@@ -22,6 +22,9 @@ include ':ontrack-ui-support'
 include ':ontrack-web'
 include ':ontrack-acceptance'
 
+// Tools
+include ':ontrack-neo4j-migration'
+
 // Core extensions
 include ':ontrack-extension-artifactory'
 include ':ontrack-extension-general'
