@@ -17,7 +17,8 @@ dependencies {
     compile 'args4j:args4j:2.33'
     compile libraries.spring_boot_starter
     compile libraries.spring_data_neo4j
-    // compile "net.nemerosa.ontrack:ontrack-repository:${ontrackBaseVersion}"
+    compile "net.nemerosa.ontrack:ontrack-repository:${ontrackBaseVersion}"
 
-    // runtime "net.nemerosa.ontrack:ontrack-repository-impl:${ontrackBaseVersion}"
+    runtime "net.nemerosa.ontrack:ontrack-repository-impl:${ontrackBaseVersion}"
+    runtime libraries.validation_impl
 }
