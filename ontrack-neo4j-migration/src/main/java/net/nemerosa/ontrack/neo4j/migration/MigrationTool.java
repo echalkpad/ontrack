@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.neo4j.migration;
 
 import org.neo4j.ogm.session.SessionFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,9 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.neo4j.config.Neo4jConfiguration;
 import org.springframework.data.neo4j.server.Neo4jServer;
 import org.springframework.data.neo4j.server.RemoteServer;
-
-import javax.sql.DataSource;
-import java.io.IOException;
+import org.springframework.data.neo4j.template.Neo4jTemplate;
 
 @Configuration
 @SpringBootApplication
@@ -32,6 +28,11 @@ public class MigrationTool extends Neo4jConfiguration {
         SpringApplication application = new SpringApplication(MigrationTool.class);
         ConfigurableApplicationContext context = application.run(args);
         context.getBeansOfType(Migration.class).get("migration").run();
+    }
+
+    @Bean
+    public Neo4jTemplate neo4jTemplate() throws Exception {
+        return new Neo4jTemplate(getSession());
     }
 
     @Override
