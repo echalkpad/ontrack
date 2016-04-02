@@ -1,15 +1,25 @@
 package net.nemerosa.ontrack.neo4j.migration;
 
 import org.neo4j.ogm.session.SessionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.neo4j.config.Neo4jConfiguration;
 import org.springframework.data.neo4j.server.Neo4jServer;
 import org.springframework.data.neo4j.server.RemoteServer;
 
+import javax.sql.DataSource;
+import java.io.IOException;
+
+@Configuration
 @SpringBootApplication
+@ComponentScan("net.nemerosa.ontrack")
 public class MigrationTool extends Neo4jConfiguration {
 
     @Autowired
