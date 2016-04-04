@@ -44,9 +44,31 @@ public class Migration extends NamedParameterJdbcDaoSupport {
         // Migrating the projects
         logger.info("Migrating projects...");
         migrateProjects();
+        // Creating the counters
+        logger.info("Creating unique id generators...");
+        createUniqueIdGenerators();
         // OK
         long end = System.currentTimeMillis();
         logger.info("End of migration ({} ms)", end - start);
+    }
+
+    private void createUniqueIdGenerators() {
+        createUniqueIdGenerator("Project");
+    }
+
+    private void createUniqueIdGenerator(String label) {
+        Result query = template.query(String.format("MATCH (p:%s) RETURN MAX(p.id) as MAX", label),
+                ImmutableMap.<String, Object>builder()
+                        .put("label", label)
+                        .build());
+        int max = (Integer) query.queryResults().iterator().next().get("MAX");
+        template.query(
+                "CREATE (u:UniqueId {label: {label}, id: {id}})",
+                ImmutableMap.<String, Object>builder()
+                        .put("label", label)
+                        .put("id", max)
+                        .build()
+        );
     }
 
     private void migrateProjects() {
@@ -58,19 +80,16 @@ public class Migration extends NamedParameterJdbcDaoSupport {
         logger.info("Migrating project {}...", project.getName());
 
         Signature projectSignature = getEventSignature("project", project.id());
-        Result projectResult = template.query(
-                "CREATE (p:Project {name: {name}, description: {description}, createdAt: {createdAt}, createdBy: {createdBy}}) RETURN id(p) as id",
+        template.query(
+                "CREATE (p:Project {id: {id}, name: {name}, description: {description}, createdAt: {createdAt}, createdBy: {createdBy}})",
                 ImmutableMap.<String, Object>builder()
+                        .put("id", project.id())
                         .put("name", project.getName())
                         .put("description", safeString(project.getDescription()))
                         .put("createdAt", Time.toJavaUtilDate(projectSignature.getTime()))
                         .put("createdBy", projectSignature.getUser().getName())
                         .build()
         );
-
-        long projectId = (Integer) projectResult.queryResults().iterator().next().get("id");
-        logger.info("Project {} id = {}", project.getName(), projectId);
-
     }
 
     private Signature getEventSignature(String entity, int entityId) {
