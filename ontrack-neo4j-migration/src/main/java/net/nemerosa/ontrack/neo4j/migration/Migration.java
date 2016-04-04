@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventType;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Project;
+import net.nemerosa.ontrack.model.structure.PromotionLevel;
 import net.nemerosa.ontrack.model.structure.Signature;
 import net.nemerosa.ontrack.repository.StructureRepository;
 import org.neo4j.ogm.session.result.Result;
@@ -56,6 +57,8 @@ public class Migration extends NamedParameterJdbcDaoSupport {
 
     private void createUniqueIdGenerators() {
         createUniqueIdGenerator("Project");
+        createUniqueIdGenerator("Branch");
+        createUniqueIdGenerator("PromotionLevel");
     }
 
     private void createUniqueIdGenerator(String label) {
@@ -111,6 +114,32 @@ public class Migration extends NamedParameterJdbcDaoSupport {
                         .put("createdAt", Time.toJavaUtilDate(signature.getTime()))
                         .put("createdBy", signature.getUser().getName())
                         .put("disabled", branch.isDisabled())
+                        .build()
+        );
+        List<PromotionLevel> promotionLevels = structure.getPromotionLevelListForBranch(branch.getId());
+        int orderNb = 0;
+        for (PromotionLevel promotionLevel : promotionLevels) {
+            migratePromotionLevel(promotionLevel, ++orderNb);
+        }
+    }
+
+    private void migratePromotionLevel(PromotionLevel promotionLevel, int orderNb) {
+        logger.info("Migrating promotion level {}:{}:{}...", promotionLevel.getProject().getName(), promotionLevel.getBranch().getName(), promotionLevel.getName());
+        Signature signature = getEventSignature("promotion_level", EventFactory.NEW_PROMOTION_LEVEL, promotionLevel.id());
+        template.query(
+                "MATCH (b:Branch {id: {branchId}}) " +
+                        "CREATE (pl:PromotionLevel {id: {id}, name: {name}, description: {description}, createdAt: {createdAt}, createdBy: {createdBy}, orderNb: {orderNb}})" +
+                        "-[:PROMOTION_LEVEL_OF]->(b)",
+                ImmutableMap.<String, Object>builder()
+                        .put("id", promotionLevel.id())
+                        .put("branchId", promotionLevel.getBranch().id())
+                        .put("name", promotionLevel.getName())
+                        .put("description", safeString(promotionLevel.getDescription()))
+                        .put("createdAt", Time.toJavaUtilDate(signature.getTime()))
+                        .put("createdBy", signature.getUser().getName())
+                        .put("orderNb", orderNb)
+                        // TODO Image type
+                        // TODO Image bytes - in a separate file
                         .build()
         );
     }
