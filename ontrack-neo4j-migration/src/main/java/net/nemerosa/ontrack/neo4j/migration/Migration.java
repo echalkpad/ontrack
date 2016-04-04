@@ -190,6 +190,12 @@ public class Migration extends NamedParameterJdbcDaoSupport {
                         .build()
         );
         // Promotion runs
+        migratePromotionRuns(build);
+        // OK
+        return true;
+    }
+
+    private void migratePromotionRuns(Build build) {
         structure.getPromotionRunsForBuild(build).forEach(promotionRun -> template.query(
                 "MATCH (b:Build {id: {buildId}}),(pl:PromotionLevel {id: {promotionLevelId}}) " +
                         "CREATE (b)-[:PROMOTED_TO {createdAt: {createdAt}, createdBy: {createdAt}, description: {description}}]->(pl)",
@@ -201,8 +207,6 @@ public class Migration extends NamedParameterJdbcDaoSupport {
                         .put("createdBy", promotionRun.getSignature().getUser().getName())
                         .build()
         ));
-        // OK
-        return true;
     }
 
     private Signature getEventSignature(String entity, EventType eventType, int entityId) {
