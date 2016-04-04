@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.Signature;
 import net.nemerosa.ontrack.repository.StructureRepository;
+import org.neo4j.ogm.session.result.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,8 +51,8 @@ public class Migration extends NamedParameterJdbcDaoSupport {
         logger.info("Migrating project {}...", project.getName());
 
         Signature projectSignature = getEventSignature("project", project.id());
-        template.query(
-                "MERGE (p:Project {name: {name}, description: {description}, createdAt: {createdAt}, createdBy: {createdBy}})",
+        Result projectResult = template.query(
+                "MERGE (p:Project {name: {name}, description: {description}, createdAt: {createdAt}, createdBy: {createdBy}}) RETURN id(p) as id",
                 ImmutableMap.<String, Object>builder()
                         .put("name", project.getName())
                         .put("description", safeString(project.getDescription()))
@@ -59,6 +60,10 @@ public class Migration extends NamedParameterJdbcDaoSupport {
                         .put("createdBy", projectSignature.getUser().getName())
                         .build()
         );
+
+        long projectId = (Integer) projectResult.queryResults().iterator().next().get("id");
+        logger.info("Project {} id = {}", project.getName(), projectId);
+
     }
 
     private Signature getEventSignature(String entity, int entityId) {
