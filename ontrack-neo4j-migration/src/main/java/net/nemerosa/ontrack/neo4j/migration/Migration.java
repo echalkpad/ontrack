@@ -3,6 +3,8 @@ package net.nemerosa.ontrack.neo4j.migration;
 import com.google.common.collect.ImmutableMap;
 import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.model.events.EventFactory;
+import net.nemerosa.ontrack.model.events.EventType;
+import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.Signature;
 import net.nemerosa.ontrack.repository.StructureRepository;
@@ -79,30 +81,51 @@ public class Migration extends NamedParameterJdbcDaoSupport {
     private void migrateProject(Project project) {
         logger.info("Migrating project {}...", project.getName());
 
-        Signature projectSignature = getEventSignature("project", project.id());
+        Signature signature = getEventSignature("project", EventFactory.NEW_PROJECT, project.id());
         template.query(
                 "CREATE (p:Project {id: {id}, name: {name}, description: {description}, createdAt: {createdAt}, createdBy: {createdBy}})",
                 ImmutableMap.<String, Object>builder()
                         .put("id", project.id())
                         .put("name", project.getName())
                         .put("description", safeString(project.getDescription()))
-                        .put("createdAt", Time.toJavaUtilDate(projectSignature.getTime()))
-                        .put("createdBy", projectSignature.getUser().getName())
+                        .put("createdAt", Time.toJavaUtilDate(signature.getTime()))
+                        .put("createdBy", signature.getUser().getName())
+                        .build()
+        );
+
+        structure.getBranchesForProject(project.getId()).forEach(this::migrateBranch);
+    }
+
+    private void migrateBranch(Branch branch) {
+        logger.info("Migrating branch {}:{}...", branch.getProject().getName(), branch.getName());
+        Signature signature = getEventSignature("branch", EventFactory.NEW_BRANCH, branch.id());
+        template.query(
+                "MATCH (p:Project {id: {projectId}}) " +
+                        "CREATE (b:Branch {id: {id}, name: {name}, description: {description}, createdAt: {createdAt}, createdBy: {createdBy}, disabled: {disabled}})" +
+                        "-[:BRANCH_OF]->(p)",
+                ImmutableMap.<String, Object>builder()
+                        .put("id", branch.id())
+                        .put("projectId", branch.getProject().id())
+                        .put("name", branch.getName())
+                        .put("description", safeString(branch.getDescription()))
+                        .put("createdAt", Time.toJavaUtilDate(signature.getTime()))
+                        .put("createdBy", signature.getUser().getName())
+                        .put("disabled", branch.isDisabled())
                         .build()
         );
     }
 
-    private Signature getEventSignature(String entity, int entityId) {
+    private Signature getEventSignature(String entity, EventType eventType, int entityId) {
         String eventUser;
         LocalDateTime eventTime;
         List<Map<String, Object>> results = getNamedParameterJdbcTemplate().queryForList(
                 String.format(
-                        "SELECT * FROM EVENTS WHERE %s = :project AND EVENT_TYPE = :type ORDER BY ID DESC LIMIT 1",
+                        "SELECT * FROM EVENTS WHERE %s = :entityId AND EVENT_TYPE = :type ORDER BY ID DESC LIMIT 1",
                         entity
                 ),
                 ImmutableMap.<String, Object>builder()
-                        .put(entity, entityId)
-                        .put("type", EventFactory.NEW_PROJECT.getId())
+                        .put("entityId", entityId)
+                        .put("type", eventType.getId())
                         .build()
         );
         if (results.isEmpty()) {
