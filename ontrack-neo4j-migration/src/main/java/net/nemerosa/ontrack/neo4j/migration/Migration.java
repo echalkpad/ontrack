@@ -189,6 +189,19 @@ public class Migration extends NamedParameterJdbcDaoSupport {
                         .put("createdBy", signature.getUser().getName())
                         .build()
         );
+        // Promotion runs
+        structure.getPromotionRunsForBuild(build).forEach(promotionRun -> template.query(
+                "MATCH (b:Build {id: {buildId}}),(pl:PromotionLevel {id: {promotionLevelId}}) " +
+                        "CREATE (b)-[:PROMOTED_TO {createdAt: {createdAt}, createdBy: {createdAt}, description: {description}}]->(pl)",
+                ImmutableMap.<String, Object>builder()
+                        .put("buildId", build.id())
+                        .put("promotionLevelId", promotionRun.getPromotionLevel().id())
+                        .put("description", safeString(promotionRun.getDescription()))
+                        .put("createdAt", Time.toJavaUtilDate(promotionRun.getSignature().getTime()))
+                        .put("createdBy", promotionRun.getSignature().getUser().getName())
+                        .build()
+        ));
+        // OK
         return true;
     }
 
