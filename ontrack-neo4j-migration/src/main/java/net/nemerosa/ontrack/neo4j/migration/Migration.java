@@ -57,6 +57,7 @@ public class Migration extends NamedParameterJdbcDaoSupport {
         createUniqueIdGenerator("Branch");
         createUniqueIdGenerator("PromotionLevel");
         createUniqueIdGenerator("ValidationStamp");
+        createUniqueIdGenerator("Build");
     }
 
     private void createUniqueIdGenerator(String label) {
@@ -126,6 +127,8 @@ public class Migration extends NamedParameterJdbcDaoSupport {
         for (ValidationStamp validationStamp : validationStamps) {
             migrateValidationStamp(validationStamp, ++orderNb);
         }
+        // Builds
+        structure.builds(branch, this::migrateBuild, BuildSortDirection.FROM_OLDEST);
     }
 
     private void migratePromotionLevel(PromotionLevel promotionLevel, int orderNb) {
@@ -168,6 +171,25 @@ public class Migration extends NamedParameterJdbcDaoSupport {
                         // TODO Image bytes - in a separate file
                         .build()
         );
+    }
+
+    private boolean migrateBuild(Build build) {
+        logger.info("Migrating build {}:{}:{}...", build.getProject().getName(), build.getBranch().getName(), build.getName());
+        Signature signature = build.getSignature();
+        template.query(
+                "MATCH (b:Branch {id: {branchId}}) " +
+                        "CREATE (r:Build {id: {id}, name: {name}, description: {description}, createdAt: {createdAt}, createdBy: {createdBy}})" +
+                        "-[:BUILD_OF]->(b)",
+                ImmutableMap.<String, Object>builder()
+                        .put("id", build.id())
+                        .put("branchId", build.getBranch().id())
+                        .put("name", build.getName())
+                        .put("description", safeString(build.getDescription()))
+                        .put("createdAt", Time.toJavaUtilDate(signature.getTime()))
+                        .put("createdBy", signature.getUser().getName())
+                        .build()
+        );
+        return true;
     }
 
     private Signature getEventSignature(String entity, EventType eventType, int entityId) {
