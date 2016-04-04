@@ -4,10 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventType;
-import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.Project;
-import net.nemerosa.ontrack.model.structure.PromotionLevel;
-import net.nemerosa.ontrack.model.structure.Signature;
+import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.repository.StructureRepository;
 import org.neo4j.ogm.session.result.Result;
 import org.slf4j.Logger;
@@ -59,6 +56,7 @@ public class Migration extends NamedParameterJdbcDaoSupport {
         createUniqueIdGenerator("Project");
         createUniqueIdGenerator("Branch");
         createUniqueIdGenerator("PromotionLevel");
+        createUniqueIdGenerator("ValidationStamp");
     }
 
     private void createUniqueIdGenerator(String label) {
@@ -116,10 +114,17 @@ public class Migration extends NamedParameterJdbcDaoSupport {
                         .put("disabled", branch.isDisabled())
                         .build()
         );
+        // Promotion levels
         List<PromotionLevel> promotionLevels = structure.getPromotionLevelListForBranch(branch.getId());
         int orderNb = 0;
         for (PromotionLevel promotionLevel : promotionLevels) {
             migratePromotionLevel(promotionLevel, ++orderNb);
+        }
+        // Validation stamps
+        List<ValidationStamp> validationStamps = structure.getValidationStampListForBranch(branch.getId());
+        orderNb = 0;
+        for (ValidationStamp validationStamp : validationStamps) {
+            migrateValidationStamp(validationStamp, ++orderNb);
         }
     }
 
@@ -135,6 +140,27 @@ public class Migration extends NamedParameterJdbcDaoSupport {
                         .put("branchId", promotionLevel.getBranch().id())
                         .put("name", promotionLevel.getName())
                         .put("description", safeString(promotionLevel.getDescription()))
+                        .put("createdAt", Time.toJavaUtilDate(signature.getTime()))
+                        .put("createdBy", signature.getUser().getName())
+                        .put("orderNb", orderNb)
+                        // TODO Image type
+                        // TODO Image bytes - in a separate file
+                        .build()
+        );
+    }
+
+    private void migrateValidationStamp(ValidationStamp validationStamp, int orderNb) {
+        logger.info("Migrating validation stamp {}:{}:{}...", validationStamp.getProject().getName(), validationStamp.getBranch().getName(), validationStamp.getName());
+        Signature signature = getEventSignature("validation_stamp", EventFactory.NEW_VALIDATION_STAMP, validationStamp.id());
+        template.query(
+                "MATCH (b:Branch {id: {branchId}}) " +
+                        "CREATE (vs:ValidationStamp {id: {id}, name: {name}, description: {description}, createdAt: {createdAt}, createdBy: {createdBy}, orderNb: {orderNb}})" +
+                        "-[:VALIDATION_STAMP_OF]->(b)",
+                ImmutableMap.<String, Object>builder()
+                        .put("id", validationStamp.id())
+                        .put("branchId", validationStamp.getBranch().id())
+                        .put("name", validationStamp.getName())
+                        .put("description", safeString(validationStamp.getDescription()))
                         .put("createdAt", Time.toJavaUtilDate(signature.getTime()))
                         .put("createdBy", signature.getUser().getName())
                         .put("orderNb", orderNb)
