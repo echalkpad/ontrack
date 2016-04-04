@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +38,13 @@ public class Migration extends NamedParameterJdbcDaoSupport {
     public void run() {
         logger.info("Starting migration...");
         long start = System.currentTimeMillis();
+        // Deleting all nodes
+        logger.info("Removing all nodes...");
+        template.query("MATCH (n) DETACH DELETE n", Collections.emptyMap());
+        // Migrating the projects
+        logger.info("Migrating projects...");
         migrateProjects();
+        // OK
         long end = System.currentTimeMillis();
         logger.info("End of migration ({} ms)", end - start);
     }
@@ -52,7 +59,7 @@ public class Migration extends NamedParameterJdbcDaoSupport {
 
         Signature projectSignature = getEventSignature("project", project.id());
         Result projectResult = template.query(
-                "MERGE (p:Project {name: {name}, description: {description}, createdAt: {createdAt}, createdBy: {createdBy}}) RETURN id(p) as id",
+                "CREATE (p:Project {name: {name}, description: {description}, createdAt: {createdAt}, createdBy: {createdBy}}) RETURN id(p) as id",
                 ImmutableMap.<String, Object>builder()
                         .put("name", project.getName())
                         .put("description", safeString(project.getDescription()))
