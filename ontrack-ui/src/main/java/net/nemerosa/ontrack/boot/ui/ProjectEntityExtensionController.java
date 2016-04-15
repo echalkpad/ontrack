@@ -4,10 +4,7 @@ import net.nemerosa.ontrack.extension.api.EntityInformationExtension;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.extension.api.ProjectEntityActionExtension;
 import net.nemerosa.ontrack.extension.api.model.EntityInformation;
-import net.nemerosa.ontrack.model.structure.ID;
-import net.nemerosa.ontrack.model.structure.ProjectEntity;
-import net.nemerosa.ontrack.model.structure.ProjectEntityType;
-import net.nemerosa.ontrack.model.structure.StructureService;
+import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.Action;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +12,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 /**
  * Controller used to get extensions on project entities.
@@ -29,11 +27,13 @@ import java.util.stream.Collectors;
 public class ProjectEntityExtensionController extends AbstractProjectEntityController {
 
     private final ExtensionManager extensionManager;
+    private final EntityFilterService entityFilterService;
 
     @Autowired
-    public ProjectEntityExtensionController(StructureService structureService, ExtensionManager extensionManager) {
+    public ProjectEntityExtensionController(StructureService structureService, ExtensionManager extensionManager, EntityFilterService entityFilterService) {
         super(structureService);
         this.extensionManager = extensionManager;
+        this.entityFilterService = entityFilterService;
     }
 
     /**
@@ -47,7 +47,7 @@ public class ProjectEntityExtensionController extends AbstractProjectEntityContr
                         .filter(Optional::isPresent)
                         .map(Optional::get)
                         .collect(Collectors.toList()),
-                uri(MvcUriComponentsBuilder.on(getClass()).getActions(entityType, id))
+                uri(on(getClass()).getActions(entityType, id))
         );
     }
 
@@ -68,7 +68,21 @@ public class ProjectEntityExtensionController extends AbstractProjectEntityContr
         // OK
         return Resources.of(
                 informations,
-                uri(MvcUriComponentsBuilder.on(getClass()).getInformation(entityType, id))
+                uri(on(getClass()).getInformation(entityType, id))
+        );
+    }
+
+    /**
+     * Gets the list of filters for an entity
+     */
+    @RequestMapping(value = "filter/{entityType}", method = RequestMethod.GET)
+    public Resources<EntityFilterDescription> getEntityFilters(@PathVariable ProjectEntityType entityType) {
+        return Resources.of(
+                entityFilterService.getEntityFilters().stream()
+                        .filter(f -> f.getScope().contains(entityType))
+                        .map(EntityFilter::getEntityFilterDescription)
+                        .collect(Collectors.toList()),
+                uri(on(getClass()).getEntityFilters(entityType))
         );
     }
 

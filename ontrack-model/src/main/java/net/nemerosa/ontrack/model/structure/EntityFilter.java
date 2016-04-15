@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.model.structure;
 
-import net.nemerosa.ontrack.model.support.NameValue;
+import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.model.form.Field;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -21,13 +21,27 @@ public interface EntityFilter {
     String getTitle();
 
     /**
-     * List of options, as name/values
+     * Configuration filed
      */
-    List<NameValue> getOptions();
+    Field getField();
 
     /**
-     * Filter on an entity
+     * Filter on an entity.
+     *
+     * @param entity Entity to filter
+     * @param value  The JSON is the result of the evaluation of the {@linkplain #getField() form input}.
      */
-    boolean accept(ProjectEntity entity, String value);
+    boolean accept(ProjectEntity entity, JsonNode value);
+
+    /**
+     * Gets the description for the filter, to be sent to a client.
+     */
+    default EntityFilterDescription getEntityFilterDescription() {
+        return new EntityFilterDescription(
+                getClass().getName(),
+                getTitle(),
+                getField()
+        );
+    }
 
 }

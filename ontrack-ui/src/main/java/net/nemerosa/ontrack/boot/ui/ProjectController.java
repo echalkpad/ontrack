@@ -43,7 +43,9 @@ public class ProjectController extends AbstractResourceController {
                 structureService.getProjectList(),
                 uri(on(ProjectController.class).getProjectList())
         )
-                .with(Link.CREATE, uri(on(ProjectController.class).newProject(null)), securityService.isGlobalFunctionGranted(ProjectCreation.class));
+                .with(Link.CREATE, uri(on(ProjectController.class).newProject(null)), securityService.isGlobalFunctionGranted(ProjectCreation.class))
+                .with("_filters", uri(on(ProjectEntityExtensionController.class).getEntityFilters(ProjectEntityType.PROJECT)))
+                ;
     }
 
     @RequestMapping(value = "view", method = RequestMethod.GET)

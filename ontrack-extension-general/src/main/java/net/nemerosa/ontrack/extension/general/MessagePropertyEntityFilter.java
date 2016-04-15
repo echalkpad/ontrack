@@ -1,19 +1,20 @@
 package net.nemerosa.ontrack.extension.general;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.json.JsonUtils;
+import net.nemerosa.ontrack.model.form.Field;
+import net.nemerosa.ontrack.model.form.Selection;
 import net.nemerosa.ontrack.model.structure.EntityFilter;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.structure.PropertyService;
-import net.nemerosa.ontrack.model.support.NameValue;
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
 public class MessagePropertyEntityFilter implements EntityFilter {
@@ -32,20 +33,25 @@ public class MessagePropertyEntityFilter implements EntityFilter {
 
     @Override
     public String getTitle() {
-        return "Messages";
+        return "Filter on message type";
     }
 
     @Override
-    public List<NameValue> getOptions() {
-        return Arrays.asList(MessageType.values()).stream()
-                .map(NameValue::of)
-                .collect(Collectors.toList());
+    public Field getField() {
+        return Selection.of("type").label("Type")
+                .optional()
+                .items(EnumUtils.getEnumList(MessageType.class));
     }
 
     @Override
-    public boolean accept(ProjectEntity entity, String value) {
-        return propertyService.getProperty(entity, MessagePropertyType.class).option()
-                .map(messageProperty -> StringUtils.equals(value, messageProperty.getType().getId()))
-                .orElse(false);
+    public boolean accept(ProjectEntity entity, JsonNode value) {
+        String type = JsonUtils.get(value, "type", false, null);
+        if (StringUtils.isNotBlank(type)) {
+            return propertyService.getProperty(entity, MessagePropertyType.class).option()
+                    .map(messageProperty -> StringUtils.equals(type, messageProperty.getType().getId()))
+                    .orElse(false);
+        } else {
+            return true;
+        }
     }
 }
