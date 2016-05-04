@@ -107,8 +107,9 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-build") {
         artifactNumToKeep(5)
     }
     deliveryPipelineConfiguration('Commit', 'Build')
-    jdk 'JDK8u25'
-    label 'ontrack' // Builds on dedicated slave
+    // JDK is declared in the Docker image
+    // Builds on dedicated slave
+    label 'ontrack'
     scm {
         git {
             remote {

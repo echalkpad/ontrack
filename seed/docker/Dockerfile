@@ -3,7 +3,9 @@
 # This would avoid to rebuild it each time we switch from one slave to the other
 
 # Base
-FROM ubuntu:14.04
+# Using a Java based image in order to get the JDK we want, without having Jenkins to provision it
+# each time on the slave
+FROM java:openjdk-8u66-jdk
 
 # Meta-information
 MAINTAINER Damien Coraboeuf <damien.coraboeuf@gmail.com>
