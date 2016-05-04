@@ -112,7 +112,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-build") {
     scm {
         git {
             remote {
-                url "git@github.com:nemerosa/ontrack.git"
+                url PROJECT_SCM_URL
                 branch "origin/${BRANCH}"
                 credentials 'jenkins'
             }
