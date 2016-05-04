@@ -114,6 +114,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-build") {
             remote {
                 url "git@github.com:nemerosa/ontrack.git"
                 branch "origin/${BRANCH}"
+                credentials 'jenkins'
             }
             wipeOutWorkspace()
             localBranch "${BRANCH}"
