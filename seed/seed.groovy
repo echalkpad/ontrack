@@ -121,6 +121,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-build") {
         }
     }
     steps {
+        // Removed --parallel in order to consume less memory (only one stack of JVM)
         gradle '''\
 clean
 versionDisplay
@@ -132,7 +133,6 @@ build
 --info
 --stacktrace
 --profile
---parallel
 '''
         environmentVariables {
             propertiesFile 'build/version.properties'
