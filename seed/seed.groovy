@@ -195,8 +195,9 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     steps {
         // Creates the Docker image
         gradle '''\
-dockerDir
+dockerLatest
 -PdockerDir=publication
+-PontrackVersion=${VERSION}
 --info
 --profile
 --stacktrace
