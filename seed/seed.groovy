@@ -127,6 +127,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-build") {
         buildInDocker {
             dockerfile 'seed/docker'
             verbose()
+            volume '/root/.gradle', '/root/.gradle'
         }
     }
 

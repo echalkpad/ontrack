@@ -14,6 +14,9 @@ MAINTAINER Damien Coraboeuf <damien.coraboeuf@gmail.com>
 RUN apt-get update \
     && apt-get install -y subversion git
 
+# Gradle cache
+VOLUME /root/.gradle
+
 # Git configuration
 RUN git config --global user.email "jenkins@nemerosa.net"
 RUN git config --global user.name "Jenkins"
