@@ -3,8 +3,8 @@
  */
 
 task dockerPrepareEnv(type: Copy, dependsOn: ':ontrack-ui:bootRepackage') {
-    from 'ontrack-ui/build/libs'
-    include '*.jar'
+    from project.properties.dockerDir
+    include 'ontrack-ui-*.jar'
     exclude '*-javadoc.jar'
     exclude '*-sources.jar'
     into project.file('docker')

@@ -126,7 +126,6 @@ versionDisplay
 versionFile
 test
 integrationTest
-dockerLatest
 osPackages
 build
 --info
@@ -173,6 +172,8 @@ build.config.gitCommit GIT_COMMIT
     }
 }
 
+// TODO Local acceptance job might be replaced by 1) Docker build+push 2) DO acceptance test
+
 // Local acceptance job
 
 job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
@@ -191,6 +192,14 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     }
     extractDeliveryArtifacts delegate, 'ontrack-acceptance'
     steps {
+        // Creates the Docker image
+        gradle '''\
+dockerDir
+-PdockerDir=publication
+--info
+--profile
+--stacktrace
+'''
         // Runs the CI acceptance tests
         gradle '''\
 ciAcceptanceTest
