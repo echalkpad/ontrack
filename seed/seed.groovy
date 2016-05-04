@@ -108,6 +108,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-build") {
     }
     deliveryPipelineConfiguration('Commit', 'Build')
     jdk 'JDK8u25'
+    label 'ontrack' // Builds on dedicated slave
     scm {
         git {
             remote {
