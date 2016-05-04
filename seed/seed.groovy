@@ -142,6 +142,8 @@ build
 --info
 --stacktrace
 --profile
+--console plain
+--no-daemon
 '''
         environmentVariables {
             propertiesFile 'build/version.properties'
