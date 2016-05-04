@@ -120,6 +120,17 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-build") {
             localBranch "${BRANCH}"
         }
     }
+    // Running in Docker
+    configure { node ->
+        node / 'properties' / 'xyz.quoidneufdocker.jenkins.dockerslaves.spec.ContainerSetDefinition' {
+            buildHostImage(class: xyz.quoidneufdocker.jenkins.dockerslaves.spec.DockerfileContainerDefinition) {
+                dockerfile 'seed/docker/Dockerfile'
+                contextPath ''
+                forcePull false
+            }
+        }
+    }
+    // Build
     steps {
         gradle '''\
 clean
