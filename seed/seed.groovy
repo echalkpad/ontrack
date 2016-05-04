@@ -120,6 +120,15 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-build") {
             localBranch "${BRANCH}"
         }
     }
+
+    // Runs in a Docker container
+    wrappers {
+        buildInDocker {
+            dockerfile 'seed/docker'
+            verbose()
+        }
+    }
+
     steps {
         // Removed --parallel in order to consume less memory (only one stack of JVM)
         gradle '''\
