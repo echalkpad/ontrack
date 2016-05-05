@@ -2,7 +2,8 @@
  * Docker tasks
  */
 
-task dockerPrepareEnv(type: Copy, dependsOn: ':ontrack-ui:bootRepackage') {
+task dockerPrepareEnv(type: Copy) {
+    mustRunAfter ':ontrack-ui:bootRepackage'
     from project.properties.dockerDir
     include 'ontrack-ui-*.jar'
     exclude '*-javadoc.jar'
