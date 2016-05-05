@@ -17,6 +17,9 @@ RUN apt-get update \
 # Gradle cache
 VOLUME /root/.gradle
 
+# Node JS cache
+VOLUME /root/.cache
+
 # Git configuration
 RUN git config --global user.email "jenkins@nemerosa.net"
 RUN git config --global user.name "Jenkins"
