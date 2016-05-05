@@ -3,13 +3,18 @@
  */
 
 task dockerPrepareEnv(type: Copy) {
-    mustRunAfter ':ontrack-ui:bootRepackage'
     from project.properties.dockerDir
     include 'ontrack-ui-*.jar'
     exclude '*-javadoc.jar'
     exclude '*-sources.jar'
     into project.file('docker')
     rename '.*', 'ontrack.jar'
+}
+
+// In case of regular (local) build, we want dockerPrepareEnv to run after ':ontrack-ui:bootRepackage'
+def ontrackUi = rootProject.findProject(':ontrack-ui')
+if (ontrackUi && ontrackUi.tasks.findByName('bootRepackage')) {
+    dockerPrepareEnv.mustRunAfter ':ontrack-ui:bootRepackage'
 }
 
 task dockerBuild(type: Exec, dependsOn: dockerPrepareEnv) {
