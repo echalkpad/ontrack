@@ -23,3 +23,9 @@ docker run \
 
 > Note that this can be really slow if you're running your Docker on a virtual machine. In native mode, like
 > in a Linux box, it's much faster :)
+
+Hint: to delete the containers after they've been used:
+
+```bash
+docker ps -a | grep "nemerosa/ontrack-build" | awk '{print $1}' | xargs docker rm -fv
+```
