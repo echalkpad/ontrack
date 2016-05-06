@@ -2,7 +2,7 @@ node('ontrack') {
     stage 'Build'
     git credentialsId: 'jenkins', url: 'https://github.com/nemerosa/ontrack.git', branch: env.BRANCH_NAME
     // Builds the Docker image used for the build
-    def image = docker.build("nemerosa/ontrack-build:${env.BRANCH_NAME}")
+    def image = docker.build("nemerosa/ontrack-build:${env.BRANCH_NAME.replaceAll('/', '-')}")
     // Docker run arguments
     def runArgs = '''\
         --volume=/root/.gradle:/root/.gradle \
