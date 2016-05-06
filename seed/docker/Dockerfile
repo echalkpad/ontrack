@@ -15,8 +15,10 @@ RUN apt-get update \
     && apt-get install -y subversion git
 
 # Installing Docker (for building the Ontrack image)
-RUN wget https://get.docker.io/builds/Linux/x86_64/docker-1.11.1.tgz -O /bin/docker
-RUN chmod +x /bin/docker
+RUN wget https://get.docker.io/builds/Linux/x86_64/docker-1.11.1.tgz -O docker.tgz
+RUN tar -xvzf docker.tgz
+RUN chmod +x docker/*
+RUN mv docker/* /usr/bin/
 
 # Gradle cache
 VOLUME /root/.gradle
