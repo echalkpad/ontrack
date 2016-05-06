@@ -1,6 +1,5 @@
 node('ontrack') {
-    stage 'Commit'
-    git credentialsId: 'jenkins', url: 'https://github.com/nemerosa/ontrack.git', branch: 'feature/slave'
+    stage 'Build'
     // Builds the Docker image used for the build
     def image = docker.build('nemerosa/ontrack-build', 'seed/docker')
     // Docker run arguments

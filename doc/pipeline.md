@@ -21,7 +21,7 @@ entity Ontrack
 
 GitHub -> Build: Triggers
 
-== Commit phase ==
+== Build phase ==
 
 group Docker slave
     Build -> Build: Unit tests and package
