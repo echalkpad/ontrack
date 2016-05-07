@@ -50,7 +50,7 @@ node('ontrack') {
             '''
     }
 
-    def versionInfo = readProperties file: 'build/version.properties
+    def versionInfo = readProperties file: 'build/version.properties'
     env.VERSION_DISPLAY = version.VERSION_DISPLAY
     echo "Version = ${env.VERSION_DISPLAY}"
 
