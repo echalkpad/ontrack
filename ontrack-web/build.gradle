@@ -18,12 +18,13 @@ node {
     version = '4.2.2'
     npmVersion = '4.2.2'
     download = true
+    workDir = project.file("${project.projectDir}/.gradle/nodejs")
 }
 
 // Environment
 
 ext {
-    cacheDir = gradle.getGradleUserHomeDir() as String ?: "${System.getProperty("user.home")}/.cache/gradle"
+    cacheDir = project.file('.cache/gradle')
 }
 
 task npmCacheConfig(type: NpmTask) {
