@@ -50,8 +50,8 @@ node('ontrack') {
             '''
     }
 
-    def version = new ConfigSlurper().parse(readFile('build/version.properties'))
-    env.VERSION_DISPLAY = version.getProperty('VERSION_DISPLAY') as String
+    def versionInfo = readProperties file: 'build/version.properties
+    env.VERSION_DISPLAY = version.VERSION_DISPLAY
     echo "Version = ${env.VERSION_DISPLAY}"
 
     stage 'Local acceptance'
