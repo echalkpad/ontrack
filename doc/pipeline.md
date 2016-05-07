@@ -26,6 +26,9 @@ GitHub -> Build: Triggers
 group Docker slave
     Build -> Build: Unit tests and package
     Build -> LocalDocker: Latest image
+
+== Local acceptance phase ==
+    
     Build -> Acceptance: Triggers
     Acceptance -> LocalDocker: Get latest image
     Acceptance -> Acceptance: Local acceptance tests

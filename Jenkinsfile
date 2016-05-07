@@ -1,5 +1,7 @@
 node('ontrack') {
+
     stage 'Build'
+
     git credentialsId: 'jenkins', url: 'https://github.com/nemerosa/ontrack.git', branch: env.BRANCH_NAME
     // Builds the Docker image used for the build
     def image = docker.build("nemerosa/ontrack-build:${env.BRANCH_NAME.replaceAll('/', '-')}", 'seed/docker')
@@ -47,4 +49,20 @@ node('ontrack') {
                 --no-daemon
             '''
     }
+
+    def version = new ConfigSlurper().parse(readFile('build/version.properties'))
+    env.VERSION_DISPLAY = version.getProperty('VERSION_DISPLAY') as String
+    echo "Version = ${env.VERSION_DISPLAY}"
+
+    stage 'Local acceptance'
+    sh '''\
+        ./gradlew \
+            ciAcceptanceTest \
+            -PacceptanceJar=ontrack-acceptance-${env.VERSION_DISPLAY}.jar \
+            --info \
+            --profile \
+            --stacktrace \
+            --console plain \
+            --no-daemon
+    '''
 }
