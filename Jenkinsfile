@@ -23,6 +23,7 @@ node('ontrack') {
                     test \
                     integrationTest \
                     osPackages \
+                    dockerLatest \
                     build \
                     --info \
                     --stacktrace \
@@ -38,20 +39,10 @@ node('ontrack') {
         } finally {
             step([$class: 'JUnitResultArchiver', testResults: '**/build/test-results/*.xml'])
         }
-        // Building the Docker image
-        sh '''\
-            ./gradlew \
-                dockerLatest \
-                --info \
-                --stacktrace \
-                --profile \
-                --console plain \
-                --no-daemon
-            '''
     }
 
     def versionInfo = readProperties file: 'build/version.properties'
-    env.VERSION_DISPLAY = version.VERSION_DISPLAY
+    env.VERSION_DISPLAY = versionInfo.VERSION_DISPLAY
     echo "Version = ${env.VERSION_DISPLAY}"
 
     stage 'Local acceptance'
