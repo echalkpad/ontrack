@@ -49,7 +49,7 @@ node('ontrack') {
     sh '''\
         ./gradlew \
             ciAcceptanceTest \
-            -PacceptanceJar=ontrack-acceptance-${env.VERSION_DISPLAY}.jar \
+            -PacceptanceJar=ontrack-acceptance/build/libs/ontrack-acceptance-${env.VERSION_DISPLAY}.jar \
             --info \
             --profile \
             --stacktrace \
