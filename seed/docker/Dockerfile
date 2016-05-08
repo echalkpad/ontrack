@@ -20,6 +20,10 @@ RUN tar -xvzf docker.tgz
 RUN chmod +x docker/*
 RUN mv docker/* /usr/bin/
 
+# Installaing Docker compose
+RUN curl -L https://github.com/docker/compose/releases/download/1.7.0/run.sh > /usr/local/bin/docker-compose
+RUN chmod +x /usr/local/bin/docker-compose
+
 # Gradle cache
 VOLUME /root/.gradle
 
