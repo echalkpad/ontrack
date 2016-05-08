@@ -24,7 +24,7 @@ node {
 
 ext {
     // cacheDir = gradle.getGradleUserHomeDir() as String ?: "${System.getProperty("user.home")}/.cache/gradle"
-    cacheDir = project.file('/.cache/gradle')
+    cacheDir = project.file('.cache/gradle')
     println "Gradle cache dir: ${cacheDir}"
 }
 
