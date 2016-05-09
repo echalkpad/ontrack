@@ -58,6 +58,8 @@ node('ontrack') {
                     --console plain \
                     --no-daemon
             '''
+
+            archive includes: 'build/ci-ontrack.log'
         } finally {
             step([$class: 'JUnitResultArchiver', testResults: '*-tests.xml'])
         }

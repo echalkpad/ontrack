@@ -30,7 +30,7 @@ task ciStop(type: ComposeStop) {
     projectName = 'ci'
     remove = true
     logs = [
-            ontrack: 'ci-ontrack.log',
+            ontrack: 'build/ci-ontrack.log',
     ]
 }
 
