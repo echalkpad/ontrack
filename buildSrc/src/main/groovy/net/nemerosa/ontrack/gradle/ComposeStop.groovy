@@ -22,8 +22,20 @@ class ComposeStop extends AbstractCompose {
      */
     String service
 
+    /**
+     * Logs to collect before stopping
+     */
+    Map<String, String> logs = [:]
+
     @TaskAction
     def run() {
+
+        // Logs?
+        logs.each { String service, String destination ->
+            logger.info("Getting log of [${service}] into ${destination}...")
+            project.file(destination).text = compose('logs', '--no-color', service)
+        }
+
         // Arguments
         List<?> args = []
         // Command

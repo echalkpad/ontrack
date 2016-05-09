@@ -29,6 +29,9 @@ task ciStop(type: ComposeStop) {
     projectFiles = ['docker-compose.yml', 'docker-compose-ci.yml']
     projectName = 'ci'
     remove = true
+    logs = [
+            ontrack: 'ci-ontrack.log',
+    ]
 }
 
 task ciAcceptanceTest(type: RemoteAcceptanceTest) {
@@ -101,6 +104,9 @@ task doStop(type: ComposeStop) {
     projectName = 'do'
     remove = true
     environment = [ONTRACK_VERSION: ontrackVersion]
+    logs = [
+            ontrack: 'ci-ontrack.log',
+    ]
 }
 
 task doAcceptanceTest(type: RemoteAcceptanceTest) {
