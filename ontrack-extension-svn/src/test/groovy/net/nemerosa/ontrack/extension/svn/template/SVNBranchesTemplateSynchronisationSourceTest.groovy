@@ -30,13 +30,13 @@ class SVNBranchesTemplateSynchronisationSourceTest {
     }
 
     @Test
-    void 'Not applicable if branch not configured for Git'() {
+    void 'Not applicable if branch not configured for SVN'() {
         when(svnService.getSVNRepository(branch)).thenReturn(Optional.empty())
         assert !source.isApplicable(branch)
     }
 
     @Test
-    void 'Applicable if branch configured for Git'() {
+    void 'Applicable if branch configured for SVN'() {
         when(svnService.getSVNRepository(branch)).thenReturn(Optional.of(SVNTestUtils.repository()))
         assert source.isApplicable(branch)
     }
