@@ -49,17 +49,18 @@ node('ontrack') {
     stage 'Local acceptance'
     image.inside(runArgs) {
         try {
-            sh '''\
-                ./gradlew \
-                    ciAcceptanceTest \
-                    -PacceptanceJar=ontrack-acceptance/build/libs/ontrack-acceptance-${VERSION_DISPLAY}.jar \
-                    --info \
-                    --profile \
-                    --stacktrace \
-                    --console plain \
-                    --no-daemon
-            '''
-
+            wrap([$class: 'Xvfb']) {
+                sh '''\
+                    ./gradlew \
+                        ciAcceptanceTest \
+                        -PacceptanceJar=ontrack-acceptance/build/libs/ontrack-acceptance-${VERSION_DISPLAY}.jar \
+                        --info \
+                        --profile \
+                        --stacktrace \
+                        --console plain \
+                        --no-daemon
+                '''
+            }
             archive includes: 'build/ci-ontrack.log'
         } finally {
             step([$class: 'JUnitResultArchiver', testResults: '*-tests.xml'])
