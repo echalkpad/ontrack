@@ -10,6 +10,7 @@ node('ontrack') {
         --volume=/root/.gradle:/root/.gradle \
         --volume=/root/.cache:/root/.cache \
         --volume=/var/run/docker.sock:/var/run/docker.sock \
+        --net=host
         '''
     // Runs the build inside the Docker image
     image.inside(runArgs) {
