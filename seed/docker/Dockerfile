@@ -10,9 +10,13 @@ FROM java:openjdk-8u66-jdk
 # Meta-information
 MAINTAINER Damien Coraboeuf <damien.coraboeuf@gmail.com>
 
-# SVN & Git installation
+# Tools installation
 RUN apt-get update \
-    && apt-get install -y subversion git
+    && apt-get install -y \
+        subversion \
+        git \
+        xvfb \
+        iceweasel
 
 # Installing Docker (for building the Ontrack image)
 RUN wget https://get.docker.io/builds/Linux/x86_64/docker-1.11.1.tgz -O docker.tgz
