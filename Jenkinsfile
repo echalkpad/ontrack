@@ -46,14 +46,16 @@ node('ontrack') {
     echo "Version = ${env.VERSION_DISPLAY}"
 
     stage 'Local acceptance'
-    sh '''\
-        ./gradlew \
-            ciAcceptanceTest \
-            -PacceptanceJar=ontrack-acceptance/build/libs/ontrack-acceptance-${VERSION_DISPLAY}.jar \
-            --info \
-            --profile \
-            --stacktrace \
-            --console plain \
-            --no-daemon
-    '''
+    image.inside(runArgs) {
+        sh '''\
+            ./gradlew \
+                ciAcceptanceTest \
+                -PacceptanceJar=ontrack-acceptance/build/libs/ontrack-acceptance-${VERSION_DISPLAY}.jar \
+                --info \
+                --profile \
+                --stacktrace \
+                --console plain \
+                --no-daemon
+        '''
+    }
 }
