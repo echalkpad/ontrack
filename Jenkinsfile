@@ -49,7 +49,7 @@ node('ontrack') {
     stage 'Local acceptance'
     image.inside(runArgs) {
         try {
-            wrap([$class: 'Xvfb', installationName: 'default', displayName: '2']) {
+            wrap([$class: 'Xvfb', installationName: 'docker', displayName: '2']) {
                 sh '''\
                     ./gradlew \
                         ciAcceptanceTest \
