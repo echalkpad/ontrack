@@ -32,11 +32,11 @@ node('ontrack') {
                     --console plain \
                     --no-daemon
                 '''
-            step([$class: 'ArtifactArchiver', artifacts: '''\
+            archive includes: '''\
                 build/distributions/ontrack-*-delivery.zip,\
                 build/distributions/ontrack*.deb,\
                 build/distributions/ontrack*.rpm\
-                '''])
+            '''
         } finally {
             step([$class: 'JUnitResultArchiver', testResults: '**/build/test-results/*.xml'])
         }
