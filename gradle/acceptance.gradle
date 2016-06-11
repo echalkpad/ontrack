@@ -29,6 +29,9 @@ task ciStop(type: ComposeStop) {
     projectFiles = ['docker-compose.yml', 'docker-compose-ci.yml']
     projectName = 'ci'
     remove = true
+    logs = [
+            ontrack: 'build/ci-ontrack.log',
+    ]
 }
 
 task ciAcceptanceTest(type: RemoteAcceptanceTest) {
