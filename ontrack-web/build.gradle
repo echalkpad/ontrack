@@ -45,6 +45,7 @@ task bowerInstall(type: NodeTask, dependsOn: npmPackages) {
     args = ["--config.storage.cache=${cacheDir}/caches/bower/cache",
             "--config.storage.packages=${cacheDir}/caches/bower/packages",
             "--config.storage.registry=${cacheDir}/caches/bower/registry",
+            '--allow-root',
             'install']
     inputs.files file('bower.json')
     outputs.files file('vendor')

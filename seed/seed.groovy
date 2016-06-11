@@ -107,12 +107,15 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-build") {
         artifactNumToKeep(5)
     }
     deliveryPipelineConfiguration('Commit', 'Build')
-    jdk 'JDK8u25'
+    // JDK is declared in the Docker image
+    // Builds on dedicated slave
+    label 'ontrack'
     scm {
         git {
             remote {
-                url "git@github.com:nemerosa/ontrack.git"
+                url PROJECT_SCM_URL
                 branch "origin/${BRANCH}"
+                credentials 'jenkins'
             }
             extensions {
                 wipeOutWorkspace()
@@ -120,20 +123,32 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-build") {
             }
         }
     }
+
+    // Runs in a Docker container
+    wrappers {
+        buildInDocker {
+            dockerfile 'seed/docker'
+            verbose()
+            volume '/root/.gradle', '/root/.gradle'
+            volume '/root/.cache', '/root/.cache'
+        }
+    }
+
     steps {
+        // Removed --parallel in order to consume less memory (only one stack of JVM)
         gradle '''\
 clean
 versionDisplay
 versionFile
 test
 integrationTest
-dockerLatest
 osPackages
 build
 --info
 --stacktrace
 --profile
---parallel
+--console plain
+--no-daemon
 '''
         environmentVariables {
             propertiesFile 'build/version.properties'
@@ -174,6 +189,8 @@ build.config.gitCommit GIT_COMMIT
     }
 }
 
+// TODO Local acceptance job might be replaced by 1) Docker build+push 2) DO acceptance test
+
 // Local acceptance job
 
 job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
@@ -192,6 +209,15 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     }
     extractDeliveryArtifacts delegate, 'ontrack-acceptance'
     steps {
+        // Creates the Docker image
+        gradle '''\
+dockerLatest
+-PdockerDir=publication
+-PontrackVersion=${VERSION}
+--info
+--profile
+--stacktrace
+'''
         // Runs the CI acceptance tests
         gradle '''\
 ciAcceptanceTest

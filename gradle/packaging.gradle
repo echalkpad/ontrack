@@ -68,6 +68,8 @@ task deliveryPackage(type: Zip) {
         include 'gradle.properties'
         exclude '**/.gradle/**'
         exclude '**/build/**'
+        include 'docker/**'
+        exclude 'docker/*.jar'
     }
     // All artifacts
     dependsOn publicationPackage

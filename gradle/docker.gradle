@@ -2,13 +2,19 @@
  * Docker tasks
  */
 
-task dockerPrepareEnv(type: Copy, dependsOn: ':ontrack-ui:bootRepackage') {
-    from 'ontrack-ui/build/libs'
-    include '*.jar'
+task dockerPrepareEnv(type: Copy) {
+    from project.properties.dockerDir
+    include 'ontrack-ui-*.jar'
     exclude '*-javadoc.jar'
     exclude '*-sources.jar'
     into project.file('docker')
     rename '.*', 'ontrack.jar'
+}
+
+// In case of regular (local) build, we want dockerPrepareEnv to run after ':ontrack-ui:bootRepackage'
+def ontrackUi = rootProject.findProject(':ontrack-ui')
+if (ontrackUi && ontrackUi.tasks.findByName('bootRepackage')) {
+    dockerPrepareEnv.mustRunAfter ':ontrack-ui:bootRepackage'
 }
 
 task dockerBuild(type: Exec, dependsOn: dockerPrepareEnv) {
@@ -16,7 +22,7 @@ task dockerBuild(type: Exec, dependsOn: dockerPrepareEnv) {
     args = [
             'build',
             '--tag',
-            "nemerosa/ontrack:${versioning.info.display}",
+            "nemerosa/ontrack:${ontrackVersion}",
             project.file('docker')
     ]
 }
@@ -26,7 +32,7 @@ task dockerLatest(type: Exec, dependsOn: dockerBuild) {
     args = [
             'tag',
             '--force',
-            "nemerosa/ontrack:${versioning.info.display}",
+            "nemerosa/ontrack:${ontrackVersion}",
             "nemerosa/ontrack:latest",
     ]
 }
