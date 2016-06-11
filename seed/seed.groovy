@@ -253,6 +253,7 @@ ciAcceptanceTest
                     condition 'SUCCESS'
                     parameters {
                         currentBuild()
+                        sameNode()
                     }
                 }
             }
