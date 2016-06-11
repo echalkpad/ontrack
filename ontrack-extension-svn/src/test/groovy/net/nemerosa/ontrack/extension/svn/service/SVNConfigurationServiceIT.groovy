@@ -70,7 +70,7 @@ class SVNConfigurationServiceIT extends AbstractServiceTestSupport {
     @IfProfileValue(name = "svn", value = "true")
     void 'SVN configuration must point to the repository root'() {
         def result = configurationService.test(
-                SVNConfiguration.of("test", repo.url)
+                SVNConfiguration.of("test", repo.url.toString())
                         .withUser("test").withPassword("test")
         )
         assert result.type == ConnectionResult.ConnectionResultType.OK
@@ -94,7 +94,7 @@ class SVNConfigurationServiceIT extends AbstractServiceTestSupport {
          * Definition of the repository
          */
 
-        def configuration = SVNTestUtils.repository(repo.url).configuration
+        def configuration = SVNTestUtils.repository(repo.url.toString()).configuration
 
         // Saves the configuration
         asUser().with(GlobalSettings).call {

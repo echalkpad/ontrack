@@ -62,7 +62,7 @@ class SvnSCMServiceDetectorIT extends AbstractServiceTestSupport {
          * Definition of the repository
          */
 
-        def configuration = SVNTestUtils.repository(repo.url).configuration
+        def configuration = SVNTestUtils.repository(repo.url.toString()).configuration
 
         /**
          * Saves the configuration
