@@ -172,6 +172,8 @@ build
                 parameters {
                     // Link based on full version
                     predefinedProp 'VERSION', '${VERSION_DISPLAY}'
+                    // On the same node
+                    sameNode()
                 }
             }
         }
@@ -188,8 +190,6 @@ build.config.gitCommit GIT_COMMIT
         }
     }
 }
-
-// TODO Local acceptance job might be replaced by 1) Docker build+push 2) DO acceptance test
 
 // Local acceptance job
 
