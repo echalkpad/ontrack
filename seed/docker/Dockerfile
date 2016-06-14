@@ -12,7 +12,7 @@ MAINTAINER Damien Coraboeuf <damien.coraboeuf@gmail.com>
 
 # SVN & Git installation
 RUN apt-get update \
-    && apt-get install -y subversion git
+    && apt-get install -y subversion git xvfb
 
 # Gradle cache
 VOLUME /root/.gradle

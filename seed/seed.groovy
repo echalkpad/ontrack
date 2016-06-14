@@ -205,6 +205,12 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
         stringParam('VERSION', '', '')
     }
     wrappers {
+        buildInDocker {
+            dockerfile 'seed/docker'
+            verbose()
+            volume '/root/.gradle', '/root/.gradle'
+            volume '/root/.cache', '/root/.cache'
+        }
         xvfb('default')
     }
     extractDeliveryArtifacts delegate, 'ontrack-acceptance'
