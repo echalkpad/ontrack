@@ -21,9 +21,6 @@ public class MigrationTool extends Neo4jConfiguration {
     @Autowired
     private MigrationProperties migrationProperties;
 
-    @Autowired
-    private Migration migration;
-
     public static void main(String[] args) {
         SpringApplication application = new SpringApplication(MigrationTool.class);
         ConfigurableApplicationContext context = application.run(args);

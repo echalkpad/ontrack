@@ -15,8 +15,8 @@ public class MigrationProperties {
     public static class Neo4JProperties {
 
         private String url = "http://localhost:7474";
-        private String username;
-        private String password;
+        private String username = "neo4j";
+        private String password = "test";
 
     }
 

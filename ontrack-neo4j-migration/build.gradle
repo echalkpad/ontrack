@@ -10,7 +10,7 @@ buildscript {
 apply plugin: 'spring-boot'
 
 ext {
-    ontrackBaseVersion = '2.20.5'
+    ontrackBaseVersion = '2.21.4'
 }
 
 dependencies {
