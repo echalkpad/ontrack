@@ -47,11 +47,13 @@ public interface RolesService {
             ValidationStampEdit.class,
             ValidationStampDelete.class,
             BuildCreate.class,
+            BuildConfig.class,
             BuildEdit.class,
             BuildDelete.class,
             ValidationRunCreate.class,
             ValidationRunStatusChange.class,
-            PromotionRunCreate.class
+            PromotionRunCreate.class,
+            PromotionRunDelete.class
     );
 
     /**

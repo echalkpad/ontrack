@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.boot.resources;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.MockURIBuilder;
@@ -9,6 +10,7 @@ import net.nemerosa.ontrack.ui.resource.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -580,6 +582,8 @@ public class CoreResourceModuleTest {
                         .with("_extra", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getInformation:BUILD,1")
                         .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:BUILD,1")
                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:BUILD,1,0,10")
+                        .with("_previous", "urn:test:net.nemerosa.ontrack.boot.ui.BuildController#getPreviousBuild:1")
+                        .with("_next", "urn:test:net.nemerosa.ontrack.boot.ui.BuildController#getNextBuild:1")
                         .with("_page", "urn:test:#:entity:BUILD:1")
                         .end(),
                 build
@@ -790,6 +794,23 @@ public class CoreResourceModuleTest {
                         .end(),
                 AccountGroup.of("Admins", "Administrators")
         );
+    }
+
+    @Test
+    public void promotion_run_delete_granted() throws IOException {
+        // Objects
+        Project p = Project.of(new NameDescription("P", "Project")).withId(ID.of(1));
+        Branch b = Branch.of(p, new NameDescription("B", "Branch")).withId(ID.of(1)).withType(BranchType.TEMPLATE_DEFINITION);
+        PromotionLevel pl = PromotionLevel.of(b, NameDescription.nd("PL", "Promotion Level")).withId(ID.of(1));
+        Build build = Build.of(b, NameDescription.nd("1", "Build 1"), Signature.of("test")).withId(ID.of(1));
+        PromotionRun run = PromotionRun.of(build, pl, Signature.of("test"), "Run").withId(ID.of(1));
+        // Security
+        when(securityService.isProjectFunctionGranted(1, PromotionRunDelete.class)).thenReturn(true);
+        // Serialization
+        JsonNode node = mapper.getObjectMapper().readTree(mapper.write(run));
+        // Checks the _delete link is present
+        String delete = JsonUtils.get(node, "_delete");
+        assertEquals("urn:test:net.nemerosa.ontrack.boot.ui.PromotionRunController#deletePromotionRun:1", delete);
     }
 
 }
