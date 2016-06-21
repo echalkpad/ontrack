@@ -1,9 +1,10 @@
 buildscript {
     repositories {
         mavenCentral()
+        maven { url "http://repo.spring.io/milestone" }
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.3.3.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.0.M3")
     }
 }
 
@@ -13,11 +14,15 @@ ext {
     ontrackBaseVersion = '2.21.4'
 }
 
+repositories {
+    mavenCentral()
+    maven { url "http://repo.spring.io/milestone" }
+}
+
 dependencies {
     compile 'args4j:args4j:2.33'
-    compile libraries.spring_boot_starter
-    compile libraries.spring_boot_starter_jdbc
-    compile libraries.spring_data_neo4j
+    compile 'org.springframework.boot:spring-boot-starter-jdbc'
+    compile 'org.springframework.boot:spring-boot-starter-data-neo4j'
     compile "net.nemerosa.ontrack:ontrack-repository:${ontrackBaseVersion}"
 
     runtime "net.nemerosa.ontrack:ontrack-repository-impl:${ontrackBaseVersion}"

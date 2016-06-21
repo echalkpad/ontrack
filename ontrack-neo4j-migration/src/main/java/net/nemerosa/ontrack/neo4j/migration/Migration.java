@@ -6,11 +6,11 @@ import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventType;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.repository.StructureRepository;
-import org.neo4j.ogm.session.result.Result;
+import org.neo4j.ogm.model.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.neo4j.template.Neo4jTemplate;
+import org.springframework.data.neo4j.template.Neo4jOperations;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
 import org.springframework.stereotype.Component;
 
@@ -26,10 +26,10 @@ public class Migration extends NamedParameterJdbcDaoSupport {
     private final Logger logger = LoggerFactory.getLogger(Migration.class);
 
     private final StructureRepository structure;
-    private final Neo4jTemplate template;
+    private final Neo4jOperations template;
 
     @Autowired
-    public Migration(StructureRepository structure, Neo4jTemplate template, DataSource dataSource) {
+    public Migration(StructureRepository structure, Neo4jOperations template, DataSource dataSource) {
         this.structure = structure;
         this.template = template;
         this.setDataSource(dataSource);
